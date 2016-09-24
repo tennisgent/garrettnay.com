@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{{ .Site.Title }}</title>
+</head>
+<body>
+  <header>
+    <h1>Garrett Nay</h1>
+  </header>
+  <main>
+    <h1>Posts</h1>
+    {{ range .Data.Pages }}
+    <article>
+      <header>
+        <h1><a href="{{ .Permalink }}">{{ .Title }}</a></h1>
+        <p>
+          Published on <time datetime="{{ .Date }}">{{ dateFormat "2 Jan 2006" .Date }}</time>
+        </p>
+      </header>
+      <p>{{ .Summary }}</p>
+    </article>
+    {{ end }}
+  </main>
+</body>
+</html>
