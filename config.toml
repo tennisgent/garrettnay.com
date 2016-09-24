@@ -1,3 +1,6 @@
 baseurl = "https://www.garrettnay.com/"
 languageCode = "en-us"
 title = "Garrett Nay"
+
+[permalinks]
+post = "/:year/:month/:title/"
