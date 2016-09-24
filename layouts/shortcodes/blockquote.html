@@ -1,0 +1,10 @@
+<blockquote{{ with .Get "link" }} cite="{{.}}"{{ end }}>
+  {{ .Inner }}
+  {{ if or ((.Get "source") (.Get "title")) (.Get "link") }}
+    <footer>
+      <p>
+        {{ .Get "source" }}{{ if and (.Get "source") (.Get "title")}}—{{ end }}<cite>{{ with .Get "link" }}<a href="{{.}}">{{ end }}{{ .Get "title" }}{{ if .Get "link" }}</a>{{ end }}</cite>
+      </p>
+    </footer>
+  {{ end }}
+</blockquote>
