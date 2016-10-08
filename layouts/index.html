@@ -1,7 +1,8 @@
 {{ partial "top.html" . }}
 
 <h1>Posts</h1>
-{{ range .Data.Pages }}
+{{ $paginator := .Paginate (where .Data.Pages "Type" "post") 5 }}
+{{ range $paginator.Pages }}
 <article>
   <header>
     <h1><a href="{{ .Permalink }}">{{ .Title }}</a></h1>
@@ -12,5 +13,9 @@
   <p>{{ .Summary }}</p>
 </article>
 {{ end }}
+<nav>
+  {{ if $paginator.HasPrev }}<a href="{{ $paginator.Prev.URL }}">Newer Posts</a>{{ end }}
+  {{ if $paginator.HasNext }}<a href="{{ $paginator.Next.URL }}">Older Posts</a>{{ end }}
+</nav>
 
 {{ partial "bottom.html" . }}
