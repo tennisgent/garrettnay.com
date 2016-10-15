@@ -4,3 +4,7 @@ title = "Garrett Nay"
 
 [permalinks]
 post = "/:year/:month/:title/"
+
+[params]
+description = "Looks like Garrett finally got himself a website."
+twitter = "@grrttn"
