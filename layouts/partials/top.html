@@ -16,6 +16,11 @@
     {{ .Scratch.Set "description" .Description}}
   {{ end }}
 
+  {{ .Scratch.Set "coverImage" .Site.Params.coverImage }}
+  {{ if .Params.coverimage }}
+    {{ .Scratch.Set "coverImage" .Params.coverimage }}
+  {{ end }}
+
   <title>{{ .Scratch.Get "title" }}</title>
 
   <!-- Meta tag help is courtesy of https://autonome.github.io/silobuster/ -->
@@ -24,7 +29,7 @@
   <!-- Schema.org markup (Google) -->
   <meta itemprop="name" content="{{ .Scratch.Get "title" }}">
   {{ with (.Scratch.Get "description") }}<meta itemprop="description" content="{{ . }}">{{ end }}
-  <meta itemprop="image" content="">
+  {{ with (.Scratch.Get "coverImage") }}<meta itemprop="image" content="{{ . | absURL }}">{{ end }}
 
   <!-- Twitter Card markup-->
   <meta name="twitter:card" content="summary_large_image">
@@ -33,14 +38,14 @@
   {{ with (.Scratch.Get "description") }}<meta name="twitter:description" content="{{ . }}">{{ end }}
   <meta name="twitter:creator" content="{{ .Site.Params.twitter }}">
   <!-- Twitter summary card with large image must be at least 280x150px -->
-  <meta name="twitter:image" content="">
+  {{ with (.Scratch.Get "coverImage") }}<meta name="twitter:image" content="{{ . | absURL }}">{{ end }}
   <meta name="twitter:image:alt" content="">
 
   <!-- Open Graph markup (Facebook, Pinterest) -->
   <meta property="og:title" content="{{ .Scratch.Get "title" }}" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="{{ .Permalink }}" />
-  <meta property="og:image" content="" />
+  {{ with (.Scratch.Get "coverImage") }}<meta property="og:image" content="{{ . | absURL }}" />{{ end }}
   {{ with (.Scratch.Get "description") }}<meta property="og:description" content="{{ . }}" />{{ end }}
   <meta property="og:site_name" content="{{ .Site.Title }}" />
 </head>
