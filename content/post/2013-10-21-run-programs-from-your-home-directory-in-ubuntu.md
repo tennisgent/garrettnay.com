@@ -167,25 +167,25 @@ Here's where it gets a little tricky. There are several hidden files in your
 home directory that have the potential to change environment variables (see
 also [EnvironmentVariables](https://help.ubuntu.com/community/EnvironmentVariables#Session-wide_environment_variables) from the Ubuntu wiki):
 
-* **.bashrc**--This is possibly the simplest place to set them. It's basically a
+* **.bashrc**---This is possibly the simplest place to set them. It's basically a
 script that gets run every time you start a bash session as a **non-login shell**
 (e.g., when you open up a new terminal window). You can just add the `export`
 command described above to the end of this file, and the next time you start a
 bash session, it will work. But if you need to access your programs outside of
 a bash shell, you're out of luck.
 
-* **.profile**--This script is run every time you start a **login shell**. That
+* **.profile**---This script is run every time you start a **login shell**. That
 includes graphical environments, so when you log in to your normal desktop, this
 script will run. The advantage here is that it runs only once when you log in,
 rather than every time you open a terminal window (although if you're only
 setting environment variables, the performance gains will be negligible). This
 script is also sourced when you log in via SSH.
 
-* **.bash_profile**--This one is similar to .profile, except it runs only in a
+* **.bash_profile**---This one is similar to .profile, except it runs only in a
 login bash shell (such as through SSH). Ubuntu doesn't have this file by default,
 but other systems might.
 
-* **.pam_environment**--Ubuntu is the only distro I'm aware of that uses this
+* **.pam_environment**---Ubuntu is the only distro I'm aware of that uses this
 file. This one is unique in that it is only for setting environment variables
 (you can't run arbitrary script commands in it). It also has a different syntax
 from the others. This file is read when you log in--before .profile is read, as
