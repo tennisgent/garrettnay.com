@@ -7,4 +7,5 @@ post = "/:year/:month/:title/"
 
 [params]
 description = "Looks like Garrett finally got himself a website."
+repo = "https://github.com/garrettn/garrettnay.com"
 twitter = "@grrttn"
