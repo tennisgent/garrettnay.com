@@ -1,7 +1,7 @@
 {{ partial "top.html" . }}
 
-<h1>Posts</h1>
 {{ $paginator := .Paginate (where .Data.Pages "Type" "post") 5 }}
+<h1>Recent Posts{{ if gt $paginator.PageNumber 1 }} (Page {{ $paginator.PageNumber }}){{ end }}</h1>
 {{ range $paginator.Pages }}
 <article>
   <header>
