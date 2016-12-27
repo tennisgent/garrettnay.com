@@ -2,6 +2,10 @@
 
 This is the source code for my website, which is built with [Hugo](http://gohugo.io/). You probably won’t ever need to use this repo in its entirety, but if you want to see an how this particular hugo site is structured, here you go!
 
+[![Build Status](https://travis-ci.org/garrettn/garrettnay.com.svg)](https://travis-ci.org/garrettn/garrettnay.com)
+[![devDependencies Status](https://david-dm.org/garrettn/garrettnay.com/dev-status.svg)](https://david-dm.org/garrettn/garrettnay.com?type=dev)
+[![forthebadge](http://forthebadge.com/images/badges/uses-html.svg)](http://forthebadge.com)
+
 ## Development
 
 ### Disclaimer
@@ -11,7 +15,7 @@ let me explain my reasons:
 
 - I like to keep my dependencies local as much as possible so that it’s easier to get up and running.
 - I’m eventually going to use other Node modules to process assets like JS and CSS, I will be using npm scripts to build anyway.
-- I’m using [Netlify](https://www.netlify.com/) to build and deploy my app, and although they have Hugo available in their build environment, I want to have more control over which version I use. I know, I’m still using a third-party module, but at least I can predict better which version I’m building with.
+- It makes it easier to handle dependencies in a CI environment.
 
 ### Requirements
 
