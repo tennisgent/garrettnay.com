@@ -55,10 +55,10 @@ The site will now be served from http://localhost:1313.
 ### Building the Site
 
 ```
-$ yarn run build
+$ yarn test
 
 # OR
-$ npm run build
+$ npm test
 
 # OR, if you have Hugo in PATH
 $ hugo

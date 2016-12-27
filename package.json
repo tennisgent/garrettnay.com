@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "start": "hugo serve",
-    "build": "hugo"
+    "test": "hugo"
   },
   "dependencies": {},
   "devDependencies": {
