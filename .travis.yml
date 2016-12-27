@@ -1,3 +1,11 @@
 language: node_js
 node_js:
   "7"
+before_deploy:
+  - yarn global add netlify-cli
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: netlify deploy -t $NETLIFY_ACCESS_TOKEN -s $NETLIFY_SITE_ID -p public
+  on:
+    branch: master
