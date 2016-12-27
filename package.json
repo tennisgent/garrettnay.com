@@ -10,7 +10,8 @@
     "start": "hugo serve",
     "build": "hugo"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "hugo-bin": "^0.4.0"
   }
 }
