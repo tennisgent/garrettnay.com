@@ -1,5 +1,21 @@
 @typography;
 
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  max-width: 60em;
+}
+
+header, footer {
+  width: 100%;
+}
+
 .cc-logo {
   border-width: 0;
   margin-bottom: 0;
