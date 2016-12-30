@@ -5,15 +5,44 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  margin: 0;
+}
+
+.site-header, .site-footer {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+
+  & a {
+    color: currentColor;
+  }
+}
+
+.site-header {
+  margin-bottom: 1em;
+}
+
+.site-title {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-size: 3rem;
+  color: white;
+
+  & > a {
+    text-decoration: none;
+  }
+}
+
+.site-footer > * {
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 main {
   flex: 1;
   max-width: 60em;
-}
-
-header, footer {
-  width: 100%;
+  margin: 0.5rem;
 }
 
 .cc-logo {
