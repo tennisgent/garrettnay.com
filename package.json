@@ -8,10 +8,14 @@
   "private": true,
   "scripts": {
     "start": "hugo serve",
-    "test": "hugo"
+    "test": "npm run css && hugo",
+    "css": "postcss -c postcss.config.json",
+    "css:watch": "npm run css -- --watch"
   },
   "dependencies": {},
   "devDependencies": {
-    "hugo-bin": "^0.4.0"
+    "autoprefixer": "^6.6.0",
+    "hugo-bin": "^0.4.0",
+    "postcss-cli": "^2.6.0"
   }
 }

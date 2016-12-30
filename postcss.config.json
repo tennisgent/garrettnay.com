@@ -1,0 +1,5 @@
+{
+  "input": "_static-src/css/*.css",
+  "dir": "static/css",
+  "use": ["autoprefixer"]
+}
