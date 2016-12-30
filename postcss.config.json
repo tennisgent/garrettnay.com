@@ -1,5 +1,5 @@
 {
   "input": "_static-src/css/*.css",
   "dir": "static/css",
-  "use": ["autoprefixer"]
+  "use": ["postcss-typography", "autoprefixer"]
 }
