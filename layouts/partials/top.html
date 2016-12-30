@@ -53,6 +53,8 @@
   {{ with (.Scratch.Get "coverImage") }}<meta property="og:image" content="{{ . | absURL }}" />{{ end }}
   {{ with (.Scratch.Get "description") }}<meta property="og:description" content="{{ . }}" />{{ end }}
   <meta property="og:site_name" content="{{ .Site.Title }}" />
+
+  <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
 </head>
 <body>
   <header>
