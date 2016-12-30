@@ -5,6 +5,8 @@ This is the source code for my website, which is built with [Hugo](http://gohugo
 [![Build Status](https://travis-ci.org/garrettn/garrettnay.com.svg)](https://travis-ci.org/garrettn/garrettnay.com)
 [![devDependencies Status](https://david-dm.org/garrettn/garrettnay.com/dev-status.svg)](https://david-dm.org/garrettn/garrettnay.com?type=dev)
 [![forthebadge](http://forthebadge.com/images/badges/uses-html.svg)](http://forthebadge.com)
+[![forthebadge](http://forthebadge.com/images/badges/uses-css.svg)](http://forthebadge.com)
+[![forthebadge](http://forthebadge.com/images/badges/uses-badges.svg)](http://forthebadge.com)
 
 ## Development
 
@@ -21,38 +23,37 @@ let me explain my reasons:
 
 - [Node.js](https://nodejs.org) (I highly recommend a version manager like [n](https://github.com/tj/n) or [nvm](https://github.com/creationix/nvm))
 - [Yarn](https://yarnpkg.com/) (recommended) or npm (comes with Node)
-- (optional) [Hugo](http://gohugo.io/)
+
+If you don’t use Yarn, `yarn` can be replaced with `npm` in the commands below.
 
 ### Getting Started
 
 Clone this repository:
 
 ```
-$ git clone https://github.com/garrettn/garrettnay.com.git
+git clone https://github.com/garrettn/garrettnay.com.git
 ```
 
 Go into the directory and install dependencies:
 
 ```
-$ cd garrettnay.com
-
-$ yarn install
-
-# OR
-$ npm install
+cd garrettnay.com
+yarn install
 ```
 
 ### Running the Development Server
 
-```
-$ yarn start
+Since Hugo is completely agnostic about how you process your static assets, you need to run the CSS processing separately from the site itself when in development mode. But because Hugo watches its own folders (including the `static` folder) and automatically rebuilds (and refreshes the page), any change caused by the CSS watcher will trigger a rebuild and refresh.
 
-# OR
-$ npm start
-
-# OR, if you have Hugo in PATH
-$ hugo serve
 ```
+# Start the development server
+yarn start
+
+# In another tab/window/whathaveyou
+npm run css:watch
+```
+
+You specifically need to use `npm` instead of `yarn` here because Yarn will cause the `postcss` command to hang for some reason. I will look into that at some point.
 
 The site will now be served from http://localhost:1313.
 
@@ -60,13 +61,9 @@ The site will now be served from http://localhost:1313.
 
 ```
 $ yarn test
-
-# OR
-$ npm test
-
-# OR, if you have Hugo in PATH
-$ hugo
 ```
+
+That one command will take care of processing the CSS as well as building the site itself. I chose to use the `test` command because 1) it’s automatically run on Travis CI without any configuration, and 2) it makes sense as a test because I want to see if the site successfully builds.
 
 The site will be built in the `public/` directory.
 
