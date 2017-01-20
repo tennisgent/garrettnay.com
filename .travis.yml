@@ -1,6 +1,8 @@
 language: node_js
 node_js:
   "7"
+after_success:
+  - bash yarn.sh
 before_deploy:
   - yarn global add netlify-cli
 deploy:
