@@ -1052,9 +1052,9 @@ http-signature@~1.1.0:
     jsprim "^1.2.2"
     sshpk "^1.7.0"
 
-hugo-bin@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/hugo-bin/-/hugo-bin-0.5.0.tgz#65db24af6460217bc16b7facf0a1cefbbbabe577"
+hugo-bin@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/hugo-bin/-/hugo-bin-0.6.0.tgz#a08608b59de2ff5bc36194751cf5c14c5aab9558"
   dependencies:
     bin-wrapper "3.0.2"
     logalot "2.1.0"
