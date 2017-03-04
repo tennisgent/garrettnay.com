@@ -56,6 +56,8 @@
   <meta property="og:site_name" content="{{ .Site.Title }}" />
 
   <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
+  {{ block "styles" . }}
+  {{ end }}
 </head>
 
 <body>
@@ -71,6 +73,9 @@
   <footer class="site-footer">
     <p><small>This site is open source! <a href="{{ .Site.Params.repo }}">View on GitHub</a>.</small></p>
   </footer>
+
+  {{ block "scripts" . }}
+  {{ end }}
 </body>
 
 </html>
