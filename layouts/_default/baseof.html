@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en" itemscope itemtype="http://schema.org/Webpage">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,8 +57,20 @@
 
   <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
 </head>
+
 <body>
   <header class="site-header">
     <h1 class="site-title"><a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a></h1>
   </header>
+
   <main role="main">
+    {{ block "main" . }}
+    {{ end }}
+  </main>
+
+  <footer class="site-footer">
+    <p><small>This site is open source! <a href="{{ .Site.Params.repo }}">View on GitHub</a>.</small></p>
+  </footer>
+</body>
+
+</html>
