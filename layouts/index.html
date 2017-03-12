@@ -6,7 +6,7 @@
 <article>
   <header>
     <h1><a href="{{ .Permalink }}">{{ .Title }}</a></h1>
-    <p>
+    <p class="publish-date">
       Published on <time datetime="{{ .Date }}">{{ dateFormat "2 Jan 2006" .Date }}</time>
     </p>
   </header>

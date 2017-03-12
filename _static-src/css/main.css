@@ -44,3 +44,7 @@ main {
   max-width: 60em;
   margin: 0.5rem;
 }
+
+.publish-date {
+  font-style: italic;
+}
