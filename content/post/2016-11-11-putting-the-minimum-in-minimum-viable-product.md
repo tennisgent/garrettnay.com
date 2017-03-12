@@ -12,6 +12,8 @@ There is no CSS. <i>Cue dramatic music</i>.
 
 Why am I doing this? First off, let me be clear that I *do* intend to make this site look nice eventually. Default browsers styles certainly aren't much to look at. But since I was making this transition to a new site with a new sytem powering it anyway, I thought I'd try something a little different: build the site up gradually, all out in the open.
 
+<!--more-->
+
 ## Goodbye Octopress, Hello Hugo
 
 You can't have a new blog without talking about the engine running it, right?
