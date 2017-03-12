@@ -1,9 +1,13 @@
+{{ define "styles" }}
+<link rel="stylesheet" href="{{ "css/list.css" | relURL }}">
+{{ end }}
+
 {{ define "main" }}
 
 {{ $paginator := .Paginate (where .Data.Pages "Type" "post") 5 }}
 <h1>Recent Posts{{ if gt $paginator.PageNumber 1 }} (Page {{ $paginator.PageNumber }}){{ end }}</h1>
 {{ range $paginator.Pages }}
-<article>
+<article class="article-preview">
   <header>
     <h1><a href="{{ .Permalink }}">{{ .Title }}</a></h1>
     <p class="publish-date">
