@@ -21,7 +21,7 @@
   {{ end }}
 </article>
 {{ end }}
-<nav>
+<nav class="paginator-nav{{ if eq $paginator.PageNumber 1 }} first-page{{ end}}">
   {{ if $paginator.HasPrev }}<a href="{{ $paginator.Prev.URL }}">Newer Posts</a>{{ end }}
   {{ if $paginator.HasNext }}<a href="{{ $paginator.Next.URL }}">Older Posts</a>{{ end }}
 </nav>

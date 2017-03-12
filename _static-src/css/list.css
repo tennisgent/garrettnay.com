@@ -2,3 +2,12 @@
   margin-bottom: 1.5em;
   border-bottom: 1px solid lightgray;
 }
+
+.paginator-nav {
+  display: flex;
+  justify-content: space-between;
+
+  &.first-page {
+    justify-content: flex-end;
+  }
+}
