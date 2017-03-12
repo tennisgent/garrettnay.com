@@ -34,6 +34,10 @@ body {
   }
 }
 
+.site-footer {
+  margin-top: 1.5em;
+}
+
 .site-footer > * {
   margin-top: 1em;
   margin-bottom: 1em;
