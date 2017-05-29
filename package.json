@@ -8,15 +8,15 @@
   "private": true,
   "scripts": {
     "start": "hugo serve",
-    "test": "npm run css && hugo",
-    "css": "postcss -c postcss.config.json",
-    "css:watch": "npm run css -- --watch"
+    "test": "npm run styles && hugo",
+    "styles": "postcss _static-src/css/*.css -d static/css",
+    "styles:watch": "npm run css -- --watch"
   },
   "dependencies": {},
   "devDependencies": {
     "hugo-bin": "^0.6.0",
-    "postcss-cli": "^2.6.0",
-    "postcss-cssnext": "^2.9.0",
-    "postcss-typography": "^1.0.0"
+    "postcss-cli": "^4.0.0",
+    "postcss-cssnext": "^2.11.0",
+    "postcss-typography": "beta"
   }
 }
