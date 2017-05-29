@@ -16,7 +16,7 @@ You can download and use the Hugo binary directly, but in this project I’m usi
 let me explain my reasons:
 
 - I like to keep my dependencies local as much as possible so that it’s easier to get up and running.
-- I’m eventually going to use other Node modules to process assets like JS and CSS, I will be using npm scripts to build anyway.
+- Since I’m using other Node modules to process assets like CSS and (eventually) JS, I'm using npm scripts to build anyway.
 - It makes it easier to handle dependencies in a CI environment.
 
 ### Requirements
@@ -43,17 +43,11 @@ yarn install
 
 ### Running the Development Server
 
-Since Hugo is completely agnostic about how you process your static assets, you need to run the CSS processing separately from the site itself when in development mode. But because Hugo watches its own folders (including the `static` folder) and automatically rebuilds (and refreshes the page), any change caused by the CSS watcher will trigger a rebuild and refresh.
-
 ```
-# Start the development server
 yarn start
-
-# In another tab/window/whathaveyou
-npm run css:watch
 ```
 
-You specifically need to use `npm` instead of `yarn` here because Yarn will cause the `postcss` command to hang for some reason. I will look into that at some point.
+This will kick off two parallel commands (using [npm-run-all](https://www.npmjs.com/package/npm-run-all)): the CSS processing in watch mode with [postcss](https://www.npmjs.com/package/postcss-cli) and the building and serving of the site itself with Hugo. Hugo is completely agnostic to how the static assets are processed, but it will rebuild and reload any time it detects changes in the `static` directory, which is where postcss puts it output files.
 
 The site will now be served from http://localhost:1313.
 
