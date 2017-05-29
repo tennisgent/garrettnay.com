@@ -14,7 +14,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "hugo-bin": "^0.6.0",
+    "hugo-bin": "^0.7.0",
     "postcss-cli": "^4.0.0",
     "postcss-cssnext": "^2.11.0",
     "postcss-typography": "beta"

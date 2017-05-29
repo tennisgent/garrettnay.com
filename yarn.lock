@@ -1196,9 +1196,9 @@ http-signature@~1.1.0:
     jsprim "^1.2.2"
     sshpk "^1.7.0"
 
-hugo-bin@^0.6.0:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/hugo-bin/-/hugo-bin-0.6.1.tgz#fa3b701d9e611cf38c3fbcf329eb7fd46345f092"
+hugo-bin@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/hugo-bin/-/hugo-bin-0.7.0.tgz#524b5816a2e6f876b686f168e229e6cf887d6516"
   dependencies:
     bin-wrapper "3.0.2"
     del-cli "0.2.1"
