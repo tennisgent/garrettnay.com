@@ -4,10 +4,11 @@ node_js:
 after_success:
   - bash yarn.sh
 before_deploy:
-  - yarn global add netlify-cli
+  - curl -L https://github.com/netlify/netlifyctl/releases/download/v0.1.3/netlifyctl-linux-amd64.tar.gz | tar -xvfz
+  - sed -i.tmp "s/site-id-goes-here/$NETLIFY_SITE_ID/" netlify.toml
 deploy:
   skip_cleanup: true
   provider: script
-  script: netlify deploy -t $NETLIFY_ACCESS_TOKEN -s $NETLIFY_SITE_ID -p public
+  script: ./netlifyctl deploy -A $NETLIFY_ACCESS_TOKEN
   on:
     branch: master
