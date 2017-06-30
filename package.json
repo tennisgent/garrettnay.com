@@ -14,7 +14,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "hugo-bin": "^0.7.0",
+    "hugo-bin": "^0.11.0",
     "npm-run-all": "^4.0.2",
     "postcss-cli": "^4.0.0",
     "postcss-cssnext": "^2.11.0",
