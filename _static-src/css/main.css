@@ -11,6 +11,8 @@ body {
 .site-header, .site-footer {
   width: 100%;
   padding: 0.5rem;
+  display: flex;
+  justify-content: center;
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
 
@@ -38,14 +40,27 @@ body {
   margin-top: 1.5em;
 }
 
-.site-footer > * {
+.site-footer-inner > * {
   margin-top: 1em;
   margin-bottom: 1em;
 }
 
+.site-header-inner,
+.site-footer-inner,
+main {
+  width: 100%;
+}
+
+@media screen and (min-width: 60rem) {
+  .site-header-inner,
+  .site-footer-inner,
+  main {
+    width: 60rem;
+  }
+}
+
 main {
   flex: 1;
-  max-width: 60em;
   margin: 0.5rem;
 }
 

@@ -62,7 +62,9 @@
 
 <body>
   <header class="site-header">
-    <h1 class="site-title"><a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a></h1>
+    <div class="site-header-inner">
+      <h1 class="site-title"><a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a></h1>
+    </div>
   </header>
 
   <main role="main">
@@ -71,7 +73,9 @@
   </main>
 
   <footer class="site-footer">
-    <p><small>This site is open source! <a href="{{ .Site.Params.repo }}">View on GitHub</a>.</small></p>
+    <div class="site-footer-inner">
+      <p><small>This site is open source! <a href="{{ .Site.Params.repo }}">View on GitHub</a>.</small></p>
+    </div>
   </footer>
 
   {{ block "scripts" . }}
