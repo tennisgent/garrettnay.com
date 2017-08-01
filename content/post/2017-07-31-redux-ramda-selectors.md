@@ -105,7 +105,62 @@ We might be pretty happy with our selector functions at this point, especially w
 
 ## What's Important to Understand about Ramda
 
-When you hear Ramda described as a functional JavaScript utility library, you may be tempted to think it's just a Lodash clone. But let me tell you, it is much more than that.
+Ramda bills itself as "A practical functional library for JavaScript programmers." Your reaction to that description might be one of the following:
+
+1. Cool!
+2. I already have Lodash for that.
+3. I've got my arrow functions and array methods and I don't need anything else, thank you very much.
+
+Before I try to persuade you to join the #1 camp, let me start off with a disclaimer. You don't *need* Ramda, any more than you need React to build view components. Bringing in a third-party library is a decision you should weigh carefully, considering costs such as increases to the size of your application, time for new team members to get up to speed, etc. And it's true that you can accomplish anything Ramda does with vanilla JavaScript. But like any third-party library, Ramda can help you stop worrying about mundane implementation details and focus instead on the unique logic of your application. That's my response to reaction #3 above.
+
+Now let's talk about #2. Why should you choose Ramda over Lodash? Lodash is a great library, and I've used it successfully in several projects. But let's take a look at what makes Ramda different, and for that I'll quote the [Ramda homepage](http://ramdajs.com/):
+
+> The primary distinguishing features of Ramda are:
+>
+> - Ramda emphasizes a purer functional style. Immutability and side-effect free functions are at the heart of its design philosophy. This can help you get the job done with simple, elegant code.
+> - Ramda functions are automatically curried. This allows you to easily build up new functions from old ones simply by not supplying the final parameters.
+> - The parameters to Ramda functions are arranged to make it convenient for currying. The data to be operated on is generally supplied last.
+
+Those last two points are what I want to emphasize when dealing with Redux selectors.
+
+### Currying
+
+Ramda functions are automatically curried. What is [currying](https://en.wikipedia.org/wiki/Currying)? It sounds delicious! Basically, currying is the idea of transforming a function that takes N arguments into a sequence of N functions that take one argument each.
+
+Let's look at the quintessential example, add. A basic, non-curried adding function might look like this:
+
+```js
+function add(a, b) {
+    return a + b
+}
+
+//or
+const add = (a, b) => a + b
+```
+
+But the curried form of add would look like this:
+
+```js
+const addCurried = a => b => a + b
+```
+
+Notice the difference? Now instead of taking both arguments at once, `addCurried` first takes one argument and returns another function that takes the second argument. Arrow functions make currying much more convenient to write in JavaScript than it used to be.
+
+We can use curried functions to create reusable functions with partially applied arguments:
+
+```js
+// create a function that adds 2 to its argument
+const add2 = addCurried(2)
+
+add2(5) // 7
+add2(13) // 15
+```
+
+As it turns out, Ramda does a sort of magic currying (yum!) that allows its functions to be used in both curried and non-curried form. In other words, if you have all the arguments for a function at once, you can call it like a regular function (e.g. `add(1, 2)`), instead of always having to use the curried form (e.g. `add(1)(2)`), which is a little unwieldy when you have all the arguments.
+
+In case you're wondering, [Ramda does have an `add` function](https://devdocs.io/ramda/index#add).
+
+### Data Last
 
 ## Writing Selectors with Ramda
 
