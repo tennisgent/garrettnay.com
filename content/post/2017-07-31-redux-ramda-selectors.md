@@ -162,6 +162,50 @@ In case you're wondering, [Ramda does have an `add` function](https://devdocs.io
 
 ### Data Last
 
+Adding is the "Hello world" of currying examples. Let's look at something a little more complex to see why it's helpful that Ramda functions take data as the last parameter.
+
+Let's say we have an array of numbers, and we want multiply each number by 2. With a curried `multiply` function we can easily create an `double` function that doubles whatever number you pass to it.
+
+*Note: from now on in this article, all Ramda functions will be prefixed with an `R` so it's clear where they come from. It's also possible to import specific functions. If you do that, and you're using Babel, I recommend checking out the [Ramda Babel plugin](https://github.com/megawac/babel-plugin-ramda) to help keep your builds smaller.*
+
+```js
+// create a function that always multiplies by 2
+const double = R.multiply(2)
+```
+
+Now how do you apply a function to every element in array to get a new array? by using a `map`, right?
+
+```js
+const nums = [1, 2, 3, 4]
+
+nums.map(double) // [2, 4, 6, 8]
+```
+
+Not bad. By passing in a named function to `map` that describes the transformation taking place, it's easier to see what's going on. But although the `double` function is reusable, the `map` isn't. You need to call `map` on every array you want to apply this transformation to.
+
+Ramda has a `map` function as well, but it has a significant difference from the built-in `map` function as well as Lodash's `map` function: you pass the transformation function first, followed by the array to be operated on.
+
+```js
+const nums2 = [11, 12, 13, 14]
+
+R.map(double, nums2) // [22, 24, 26, 28]
+```
+
+So far we haven't gained anything, but remember that Ramda functions are automatically curried. That means we can pass the first argument to `map` and get a new function that takes the second argument.
+
+```js
+// create a new function that doubles every element of an array
+const doubleAll = R.map(double)
+
+doubleAll(nums) // [2, 4, 6, 8]
+```
+
+See what we just did there? We created a new function that takes an array and returns a new one with each element doubled. And the reason we could do that is that the `map` function takes the array—the data to be operated on—last. The data is the part most likely to change, so by putting it last, we can much more easily build up expressive functions that can be reused with multiple pieces of data. When the data is supplied first, as in the built-in `map` function and Lodash's `map`, we're more likely to write a bunch of one-off functions that are less expressive, because the data is always changing.
+
+I hope you now see how these two attributes—automatically curried functions and taking data last—make Ramda more than a simple utility library. It's a toolkit for writing more declarative, functional code.
+
+Now let's see how Ramda helps us write better Redux selectors.
+
 ## Writing Selectors with Ramda
 
 ## Why?
