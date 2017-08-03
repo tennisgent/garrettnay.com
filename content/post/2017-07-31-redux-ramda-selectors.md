@@ -208,4 +208,36 @@ Now let's see how Ramda helps us write better Redux selectors.
 
 ## Writing Selectors with Ramda
 
+Let's go back to the selector examples we wrote earlier and rewrite them using Ramda.
+
+### `getUserName`
+
+For this one we need to get nested properties off the `state` object. Ramda happens to have a convenient function for this purpose, [`path`](https://devdocs.io/ramda/index#path). The first parameter is an array defining the path, and the second is the object to find the property on.
+
+Let's use an arrow function for brevity's sake.
+
+```js
+export const getUserName = state => R.path(['user', 'name'], state)
+```
+
+One nice benefit of using `path` is that if any part of the path is undefined, it will return `undefined` without throwing an error. Granted, if you've set up your Redux store properly, the `user` object should never be undefined, but it's still a nice way to avoid that dreaded error.
+
+Remember how Ramda functions are curried? Let's use the curried form of `path` instead:
+
+```js
+export const getUserName = state => R.path(['user', 'name'])(state)
+```
+
+Wait a second. Do you see something odd here? We've now defined a function that takes an object `state` and creates a new function that takes that same object `state`. In the end we've written a function that calls another function with exactly the same arguments. That sounds to me like an unnecessary layer, so let's remove it!
+
+```js
+export const getUserName = R.path(['user', 'name'])
+```
+
+Boom. There you have it. [Try it out](http://ramdajs.com/repl/#?const state %3D {%0A user%3A {%0A name%3A 'Johann'%0A }%0A}%0A%0A%2F%2F const getUserName %3D state %3D> R.path(['user'%2C 'name']%2C state\)%0Aconst getUserName %3D R.path(['user'%2C 'name']\)%0A%0AgetUserName(state\)); you'll see that it works exactly the same way.
+
+Notice that we've now defined a function without ever mentioning the data it operates on. This technique is what is known as [point-free style or tacit programming](https://en.wikipedia.org/wiki/Tacit_programming). The idea of operating on data without ever identifying the arguments that are being operated on may sound bizarre—it certainly did to me when I first learned about it. I'll discuss some of the benefits of point-free style at the end of the article. For now, at the very least we can see that it makes for a more concise function definition, and who doesn't love cutting down on typing?
+
+Ramda's automatic currying and order of parameters are what make point-free style possible.
+
 ## Why?
