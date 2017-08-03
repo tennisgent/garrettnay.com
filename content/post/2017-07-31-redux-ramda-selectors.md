@@ -26,6 +26,16 @@ Selector functions take the Redux state tree object and return whatever data you
 
     This example might seem a little silly, but the point is it hides the internal structure of the state from consuming components. Components don't care about the shape of the state; all they care about is getting the data they need.
 
+- Deriving data from a property:
+
+    ```js
+    function isLoggedIn(state) {
+        return state.user.id != null
+    }
+    ```
+
+    Similar to the first example, only now instead of reading a property directly, we're calculating a value based on it—in this case, whether it's set or not. Calculating boolean values based on state properties are a common use case for Redux selectors. Other types of calculations are certainly possible too.
+
 - Getting a list of items:
 
     ```js
@@ -36,15 +46,7 @@ Selector functions take the Redux state tree object and return whatever data you
     }
     ```
 
-    This selector assumes your items are stored by two different reducers: one that keeps a list of IDs and one that keeps them in an object keyed by ID. This normalization of state structure is recommended [in the Redux docs](http://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html).
-
-- Deriving data from a property:
-
-    ```js
-    function isLoggedIn(state) {
-        return state.user.id != null
-    }
-    ```
+    This selector assumes your items are stored by two different reducers: one that keeps a list of IDs and one that keeps them in an object keyed by ID. This normalization of state structure is recommended [in the Redux docs](http://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html). Structuring the data this way makes it easier to update individual objects (by looking them up in the key-value object) while still preserving a specific order (by tracking their ids in an array). To get the full objects as an array, though, we need to map over the ids like this, which is why a selector function is helpful.
 
 - Deriving data from a list of items:
 
@@ -66,14 +68,14 @@ export function getUserName(state) {
     return state.user.name
 }
 
+export function isLoggedIn(state) {
+    return state.user.id != null
+}
+
 function getItems(state) {
     return state.items.ids.map(function (id) {
         return ids[id]
     })
-}
-
-export function isLoggedIn(state) {
-    return state.user.id != null
 }
 
 function getTotalItemCount(state) {
@@ -89,10 +91,10 @@ If you're in an environment that supports [ES2015 arrow functions](https://devdo
 ```js
 export const getUserName = state => state.user.name
 
+export const isLoggedIn = state => state.user.id != null
+
 export const getItems = state =>
     return state.items.ids.map(id => state.items.byId[id])
-
-export const isLoggedIn = state => state.user.id != null
 
 export const getTotalItemCount = state =>
     getItems(state)
