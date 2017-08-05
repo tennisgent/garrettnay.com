@@ -1,0 +1,29 @@
+{{ define "styles" }}
+<link rel="stylesheet" href="{{ "css/list.css" | relURL }}">
+{{ end }}
+
+{{ define "main" }}
+
+{{ $paginator := .Paginate (where .Data.Pages "Section" "post") 5 }}
+<h1>Blag{{ if gt $paginator.PageNumber 1 }} (Page {{ $paginator.PageNumber }}){{ end }}</h1>
+{{ range $paginator.Pages }}
+<article class="article-preview">
+  <header>
+    <h1><a href="{{ .Permalink }}">{{ .Title }}</a></h1>
+    <p class="publish-date">
+      Published on <time datetime="{{ .Date }}">{{ dateFormat "2 Jan 2006" .Date }}</time>
+    </p>
+  </header>
+  <p>{{ .Summary }}</p>
+
+  {{ if .Truncated }}
+  <p><a href="{{ .Permalink }}">Read more</a></p>
+  {{ end }}
+</article>
+{{ end }}
+<nav class="paginator-nav{{ if eq $paginator.PageNumber 1 }} first-page{{ end}}">
+  {{ if $paginator.HasPrev }}<a href="{{ $paginator.Prev.URL }}">Newer Posts</a>{{ end }}
+  {{ if $paginator.HasNext }}<a href="{{ $paginator.Next.URL }}">Older Posts</a>{{ end }}
+</nav>
+
+{{ end }}
