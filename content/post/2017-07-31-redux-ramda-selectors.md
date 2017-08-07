@@ -242,6 +242,20 @@ Notice that we've now defined a function without ever mentioning the data it ope
 
 Ramda's automatic currying and order of parameters are what make point-free style possible.
 
+### `isLoggedIn`
+
+Our next selector, `isLoggedIn`, is similar to the first one except it calculates a boolean based on a state property. Here's the original, non-vanilla version for reference:
+
+```js
+export const isLoggedIn = state => state.user.id != null
+```
+
+It's a simple enough function, but could we make it more, well, functional? In other words, could we rewrite it in such a way that it is built up from smaller, potentially more reusable functions?
+
+With Ramda we certainly can!
+
+A way I've found helpful for rewriting functions like this is to ask myself: What am I trying to learn from the data? In this case, how do I define being logged in based on the state? According to this function, the user is logged in when the path `user.id` on the state object is not null or undefined. Therefore, if we could define a function `pathIsNotNullOrUndefined` to which we could pass the path and the state object, we'd be well on our way to Functional Town!
+
 [next example](http://ramdajs.com/repl/#?const%20isLoggedInOld%20%3D%20state%20%3D%3E%20state.user.id%20%21%3D%20null%0A%0Aconst%20state%20%3D%20%7B%20user%3A%20%7B%20id%3A%20%27abac%27%20%7D%20%7D%0A%0A%2F%2Fconst%20isLoggedIn%20%3D%20state%20%3D%3E%20not%28isNil%28path%28%5B%27user%27%2C%20%27id%27%5D%2C%20state%29%29%29%0A%0Aconst%20isNotNil%20%3D%20complement%28isNil%29%0A%0Aconst%20pathIsNotNil%20%3D%20p%20%3D%3E%20compose%28isNotNil%2C%20path%28p%29%29%0A%0Aconst%20isLoggedIn%20%3D%20compose%28isNotNil%2C%20path%28%5B%27user%27%2C%20%27id%27%5D%29%29%0A%0Aconst%20isLoggedIn2%20%3D%20pathIsNotNil%28%5B%27user%27%2C%20%27id%27%5D%29%0A%0AisLoggedIn2%28state%29)
 
 ## Why?
