@@ -256,6 +256,54 @@ With Ramda we certainly can!
 
 A way I've found helpful for rewriting functions like this is to ask myself: What am I trying to learn from the data? In this case, how do I define being logged in based on the state? According to this function, the user is logged in when the path `user.id` on the state object is not null or undefined. Therefore, if we could define a function `pathIsNotNullOrUndefined` to which we could pass the path and the state object, we'd be well on our way to Functional Town!
 
+So what we're looking for is a function we could call like this:
+
+```js
+export const isLoggedIn = pathIsNotNullOrUndefined(['user', 'id'])
+```
+
+Based on the name of the function, we can see there are two parts: finding the path and determining if a value is not null or undefined. Sounds like a place for making some more functions. We already know we have `path`, so let's take a crack at the first part, and then we'll se how we can put the two together.
+
+We could define our own `isNotNullOrUndefined` (or `isSet`, or whatever you'd like to call it) without too much difficulty, but for the sake of this article let's look at what Ramda has to offer us.
+
+Sometimes it can be hard to find the right Ramda function because their names are based on functional languages like Haskell and are less common in the JavaScript world. But it turns out Ramda [has a function called `isNil`](https://devdocs.io/ramda/index#isNil) that returns `true` if the input value is `null` or `undefined`.
+
+```js
+R.isNil(null) // true
+R.isNil(undefined) // true
+R.isNil(false) // false
+```
+
+Great! Now all we need to do is negate it. We could do it like this:
+
+```js
+const isNotNil = val => !R.isNil(val)
+```
+
+Or we could go even further with using Ramda functions. You guessed it! There is a [`not` function](https://devdocs.io/ramda/index#not) that does basically the same thing as `!`:
+
+```js
+const isNotNil = val = R.not(R.isNil(val))
+```
+
+The second version seems silly, but now we're using nothing but functions. Yay! But we can do better. Now that you've had a taste of point-free style, you'll hopefully start looking for opportunities to refactor to that style. Can we define a function that doesn't reference `val` at all?
+
+Yes. Yes, we can. But instead of using `not`, we'll use [a different function called `complement`](https://devdocs.io/ramda/index#complement). Whereas `not` immediately returns the complement of the *value* you pass to it (what you would get by putting a `!` in front of it), `complement` takes a *function* and returns a new function that, when called, returns the complement of whatever the original function returns.
+
+If that doesn't make sense, seeing it in action might clear it up:
+
+```js
+const isNotNil = R.complement(R.isNil)
+
+isNotNil(true) // true
+isNotNil(null) // false
+isNotNil(undefined) // false
+```
+
+Great, so now we have an `isNotNil` function, written in that sweet, sweet point-free style for good measure.
+
+Now how do we put that together with `path`? First let's try to the naive approach:
+
 [next example](http://ramdajs.com/repl/#?const%20isLoggedInOld%20%3D%20state%20%3D%3E%20state.user.id%20%21%3D%20null%0A%0Aconst%20state%20%3D%20%7B%20user%3A%20%7B%20id%3A%20%27abac%27%20%7D%20%7D%0A%0A%2F%2Fconst%20isLoggedIn%20%3D%20state%20%3D%3E%20not%28isNil%28path%28%5B%27user%27%2C%20%27id%27%5D%2C%20state%29%29%29%0A%0Aconst%20isNotNil%20%3D%20complement%28isNil%29%0A%0Aconst%20pathIsNotNil%20%3D%20p%20%3D%3E%20compose%28isNotNil%2C%20path%28p%29%29%0A%0Aconst%20isLoggedIn%20%3D%20compose%28isNotNil%2C%20path%28%5B%27user%27%2C%20%27id%27%5D%29%29%0A%0Aconst%20isLoggedIn2%20%3D%20pathIsNotNil%28%5B%27user%27%2C%20%27id%27%5D%29%0A%0AisLoggedIn2%28state%29)
 
 ## Why?
