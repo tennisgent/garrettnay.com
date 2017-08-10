@@ -304,6 +304,30 @@ Great, so now we have an `isNotNil` function, written in that sweet, sweet point
 
 Now how do we put that together with `path`? First let's try to the naive approach:
 
+```js
+const pathIsNotNil = (path, state) => isNotNil(R.path(path, state))
+```
+
+Now remember, up above we said we wanted the function `pathIsNotNil` to take a path argument and return a new function that takes the state object so we can use it in a point-free way—in other words, we want it to be curried. Thanks to arrow functions, we can do that without changing too much:
+
+```js
+const pathIsNotNil = path => state => isNotNil(R.path(path, state))
+```
+
+Now it's curried. Beautiful. But can we get rid of that pesky `state` parameter and make it even more beautiful?
+
+Ramda's [`compose` function](https://devdocs.io/ramda/index#compose) can help us here. The concept of [function composition](https://en.wikipedia.org/wiki/Function_composition_\(computer_science\)) is not unique to Ramda; it's a fundamental part of functional programming and has its roots in mathematics. (Side note: the deeper you get into functional programming, the more it will feel like you are doing math. I suppose that's because you're using functions in the truest sense of the word, just like functions in algebra. See? All those years of math *did* turn out to be useful!)
+
+If you've ever used Lodash's `flow` function, you've used function composition, although in Ramda the functions are invoked from right to left rather than left to right, which is typical most functional languages. For example, using `compose` we can rewrite the above version of `pathIsNotNil` like so:
+
+```js
+const pathIsNotNil = path => state => R.compose(isNotNil, R.path)(path, state)
+```
+
+In this composed function, we pass the arguments `path` and `state` to the rightmost function, `R.path` first. The return value of that function is then passed to the next-rightmost function—in this case `isNotNil`—and so on until we come to the end of the functions and get a final return value. One important thing to remember here is that the rightmost function can take any number of arguments, but the rest of them have to take only one.
+
+If the right-to-left composition seems weird to you, think of it this way: if the functions were nested inside each other as we originally had them, which function would be evaluated first? The innermost one, or in other words, the rightmost one. Alternatively, you can use Ramda's [`pipe` function](https://devdocs.io/ramda/index#pipe), which is the left-to-right version of `compose`, but I encourage you to try to get used to right-to-left composition because that is the way it is typically done.
+
 [next example](http://ramdajs.com/repl/#?const%20isLoggedInOld%20%3D%20state%20%3D%3E%20state.user.id%20%21%3D%20null%0A%0Aconst%20state%20%3D%20%7B%20user%3A%20%7B%20id%3A%20%27abac%27%20%7D%20%7D%0A%0A%2F%2Fconst%20isLoggedIn%20%3D%20state%20%3D%3E%20not%28isNil%28path%28%5B%27user%27%2C%20%27id%27%5D%2C%20state%29%29%29%0A%0Aconst%20isNotNil%20%3D%20complement%28isNil%29%0A%0Aconst%20pathIsNotNil%20%3D%20p%20%3D%3E%20compose%28isNotNil%2C%20path%28p%29%29%0A%0Aconst%20isLoggedIn%20%3D%20compose%28isNotNil%2C%20path%28%5B%27user%27%2C%20%27id%27%5D%29%29%0A%0Aconst%20isLoggedIn2%20%3D%20pathIsNotNil%28%5B%27user%27%2C%20%27id%27%5D%29%0A%0AisLoggedIn2%28state%29)
 
 ## Why?
