@@ -328,6 +328,36 @@ In this composed function, we pass the arguments `path` and `state` to the right
 
 If the right-to-left composition seems weird to you, think of it this way: if the functions were nested inside each other as we originally had them, which function would be evaluated first? The innermost one, or in other words, the rightmost one. Alternatively, you can use Ramda's [`pipe` function](https://devdocs.io/ramda/index#pipe), which is the left-to-right version of `compose`, but I encourage you to try to get used to right-to-left composition because that is the way it is typically done.
 
-[next example](http://ramdajs.com/repl/#?const%20isLoggedInOld%20%3D%20state%20%3D%3E%20state.user.id%20%21%3D%20null%0A%0Aconst%20state%20%3D%20%7B%20user%3A%20%7B%20id%3A%20%27abac%27%20%7D%20%7D%0A%0A%2F%2Fconst%20isLoggedIn%20%3D%20state%20%3D%3E%20not%28isNil%28path%28%5B%27user%27%2C%20%27id%27%5D%2C%20state%29%29%29%0A%0Aconst%20isNotNil%20%3D%20complement%28isNil%29%0A%0Aconst%20pathIsNotNil%20%3D%20p%20%3D%3E%20compose%28isNotNil%2C%20path%28p%29%29%0A%0Aconst%20isLoggedIn%20%3D%20compose%28isNotNil%2C%20path%28%5B%27user%27%2C%20%27id%27%5D%29%29%0A%0Aconst%20isLoggedIn2%20%3D%20pathIsNotNil%28%5B%27user%27%2C%20%27id%27%5D%29%0A%0AisLoggedIn2%28state%29)
+Now can we get rid of the `state` parameter? Given what we know about how Ramda functions work, we might try this:
+
+```js
+// This doesn't actually work 😦
+const pathIsNotNil = path => state => R.compose(isNotNil, R.path)(path)(state)
+```
+
+If we could do that, then we could take out the `state` parameter entirely. Unfortunately, composing doesn't work that way. According to [the Ramda docs](http://devdocs.io/ramda/index#compose), "The result of compose is not automatically curried." So we can't pass arguments to a composed function one at a time.
+
+But all is not lost! The `path` function *is* curried, so we can partially apply that specific function with the path argument, resulting in a composed function that takes only one argument to begin with, like so:
+
+```js
+// This works! 😄
+const pathIsNotNil = path => state => R.compose(isNotNil, R.path(path))(state)
+```
+
+With that in place, now we can remove `state`, resulting in our final, beautiful version of `pathIsNotNil`:
+
+```js
+const pathIsNotNil = path => R.compose(isNotNil, R.path(path))
+```
+
+You may be tempted to keep going and try to take the `path` parameter as well, making it 100% point-free. However, because of the limitations of `compose`, I'm not sure it's possible to do. I certainly haven't found a way to do it; if you have, let me know! In any case, the version we have here is pretty good. And now it's ready to be used in our selector:
+
+```js
+export const isLoggedIn = pathIsNotNil(['user', 'id'])
+```
+
+Hurrah! We did it! And what's more, now we have a couple utility functions (`isNotNil` and `pathIsNotNil`) that will almost certainly be useful elsewhere in the application.
+
+[Try out this example in the Ramda REPL](http://ramdajs.com/repl/#?%2F%2F%20Note%3A%20All%20Ramda%20functions%20are%20automatically%20imported%20without%20the%20R%20namespace%0A%0Aconst%20state%20%3D%20%7B%20user%3A%20%7B%20id%3A%20%27abac%27%20%7D%20%7D%0A%0A%2F%2F%20Old%20version%0A%2F%2F%20export%20const%20isLoggedIn%20%3D%20state%20%3D%3E%20state.user.id%20%21%3D%20null%0A%0Aconst%20isNotNil%20%3D%20complement%28isNil%29%0A%0Aconst%20pathIsNotNil%20%3D%20p%20%3D%3E%20compose%28isNotNil%2C%20path%28p%29%29%0A%0Aconst%20isLoggedIn%20%3D%20pathIsNotNil%28%5B%27user%27%2C%20%27id%27%5D%29%0A%0AisLoggedIn%28state%29).
 
 ## Why?
