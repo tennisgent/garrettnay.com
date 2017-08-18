@@ -36,25 +36,13 @@ Selector functions take the Redux state tree object and return whatever data you
 
     Similar to the first example, only now instead of reading a property directly, we're calculating a value based on it—in this case, whether it's set or not. Calculating boolean values based on state properties are a common use case for Redux selectors. Other types of calculations are certainly possible too.
 
-- Getting a list of items:
-
-    ```js
-    function getItems(state) {
-        return state.items.ids.map(function (id) {
-            return ids[id]
-        })
-    }
-    ```
-
-    This selector assumes your items are stored by two different reducers: one that keeps a list of IDs and one that keeps them in an object keyed by ID. This normalization of state structure is recommended [in the Redux docs](http://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html). Structuring the data this way makes it easier to update individual objects (by looking them up in the key-value object) while still preserving a specific order (by tracking their ids in an array). To get the full objects as an array, though, we need to map over the ids like this, which is why a selector function is helpful.
-
 - Deriving data from a list of items:
 
     ```js
     function getTotalItemCount(state) {
-        return getItems(state)
-            .reduce(function (total, item) {
-                return total + item.count
+        return Object.keys(state.items.byId)
+            .reduce(function(total, id) {
+                return total + state.items.byId[id].count
             }, 0)
     }
     ```
@@ -72,16 +60,10 @@ export function isLoggedIn(state) {
     return state.user.id != null
 }
 
-function getItems(state) {
-    return state.items.ids.map(function (id) {
-        return ids[id]
-    })
-}
-
 function getTotalItemCount(state) {
-    return getItems(state)
-        .reduce(function (total, item) {
-            return total + item.count
+    return Object.keys(state.items.byId)
+        .reduce(function(total, id) {
+            return total + state.items.byId[id].count
         }, 0)
 }
 ```
@@ -93,12 +75,9 @@ export const getUserName = state => state.user.name
 
 export const isLoggedIn = state => state.user.id != null
 
-export const getItems = state =>
-    return state.items.ids.map(id => state.items.byId[id])
-
 export const getTotalItemCount = state =>
-    getItems(state)
-        .reduce((total, item) => total + item.count, 0)
+    Object.keys(state.items.byId)
+        .reduce((total, id) => total.state.items[byId].count, 0)
 ```
 
 Those implicit returns make the functions nice and succinct. Not bad!
@@ -359,5 +338,9 @@ export const isLoggedIn = pathIsNotNil(['user', 'id'])
 Hurrah! We did it! And what's more, now we have a couple utility functions (`isNotNil` and `pathIsNotNil`) that will almost certainly be useful elsewhere in the application.
 
 [Try out this example in the Ramda REPL](http://ramdajs.com/repl/#?%2F%2F%20Note%3A%20All%20Ramda%20functions%20are%20automatically%20imported%20without%20the%20R%20namespace%0A%0Aconst%20state%20%3D%20%7B%20user%3A%20%7B%20id%3A%20%27abac%27%20%7D%20%7D%0A%0A%2F%2F%20Old%20version%0A%2F%2F%20export%20const%20isLoggedIn%20%3D%20state%20%3D%3E%20state.user.id%20%21%3D%20null%0A%0Aconst%20isNotNil%20%3D%20complement%28isNil%29%0A%0Aconst%20pathIsNotNil%20%3D%20p%20%3D%3E%20compose%28isNotNil%2C%20path%28p%29%29%0A%0Aconst%20isLoggedIn%20%3D%20pathIsNotNil%28%5B%27user%27%2C%20%27id%27%5D%29%0A%0AisLoggedIn%28state%29).
+
+### `getTotalItemCount`
+
+[next example](http://ramdajs.com/repl/#?const%20state%20%3D%20%7B%0A%20items%3A%20%7B%0A%20byId%3A%20%7B%0A%20abc123%3A%20%7B%20count%3A%202%20%7D%2C%0A%20abc125%3A%20%7B%20count%3A%204%20%7D%0A%20%7D%0A%20%7D%0A%7D%0A%0A%2F%2F%20function%20getTotalItemCount%28state%29%20%7B%0A%2F%2F%20return%20Object.keys%28state.items.byId%29%0A%2F%2F%20.reduce%28%28total%2C%20id%29%20%3D%3E%20total%20%2B%20state.items.byId%5Bid%5D.count%2C%200%29%0A%2F%2F%20%7D%0A%0Aconst%20sumCounts%20%3D%20compose%28sum%2C%20values%2C%20map%28prop%28%27count%27%29%29%29%0A%0Aconst%20pathOrObj%20%3D%20pathOr%28%7B%7D%29%0A%0Aconst%20getTotalItemCount%20%3D%20compose%28sumCounts%2C%20pathOrObj%28%5B%27items%27%2C%20%27byId%27%5D%29%29%0A%0A%2F%2F%20getTotalItemCount%28state%29%0A%0Areduce%28%28total%2C%20item%29%20%3D%3E%20total%20%2B%20item.count%2C%200%2C%20state.items.byId%29)
 
 ## Why?
