@@ -343,6 +343,18 @@ Hurrah! We did it! And what's more, now we have a couple utility functions (`isN
 
 ### `getTotalItemCount`
 
+Now for our most complicated selector yet, `getTotalItemCount`. Instead of looking at a single state value, it operates on a list of them. Here's what we currently have:
+
+```js
+export const getTotalItemCount = state =>
+    Object.values(state.items.byId)
+        .reduce((total, item) => total + item.count, 0)
+```
+
+There's a fair amount of stuff going on here, and once you get to a certain level of complexity you'll find that there are multiple ways to break a problem down in a functional style. The way I'm presenting here isn't the only way, nor is it necessarily the best way. Someone more advanced in FP and Ramda could almost certainly find a more efficient or sensible way to do it. This is simply *a* way, and I encourage you to try different ways and see if you can make it better.
+
+As with the last example, let's consider what we are trying to learn from the data. Putting aside for a moment all the work we need to do to get to the relevant data, the meat of what we're trying to do is this: get the sum of every item's `count` property.
+
 [next example](http://ramdajs.com/repl/#?const%20state%20%3D%20%7B%0A%20items%3A%20%7B%0A%20byId%3A%20%7B%0A%20abc123%3A%20%7B%20count%3A%202%20%7D%2C%0A%20abc125%3A%20%7B%20count%3A%204%20%7D%0A%20%7D%0A%20%7D%0A%7D%0A%0A%2F%2F%20function%20getTotalItemCount%28state%29%20%7B%0A%2F%2F%20return%20Object.keys%28state.items.byId%29%0A%2F%2F%20.reduce%28%28total%2C%20id%29%20%3D%3E%20total%20%2B%20state.items.byId%5Bid%5D.count%2C%200%29%0A%2F%2F%20%7D%0A%0Aconst%20sumCounts%20%3D%20compose%28sum%2C%20values%2C%20map%28prop%28%27count%27%29%29%29%0A%0Aconst%20pathOrObj%20%3D%20pathOr%28%7B%7D%29%0A%0Aconst%20getTotalItemCount%20%3D%20compose%28sumCounts%2C%20pathOrObj%28%5B%27items%27%2C%20%27byId%27%5D%29%29%0A%0A%2F%2F%20getTotalItemCount%28state%29%0A%0Areduce%28%28total%2C%20item%29%20%3D%3E%20total%20%2B%20item.count%2C%200%2C%20state.items.byId%29)
 
 ## Why?
