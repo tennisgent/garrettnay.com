@@ -47,7 +47,9 @@ Selector functions take the Redux state tree object and return whatever data you
     }
     ```
 
-    Assuming each item object has a `count` property, this selector uses [`array.reduce`](https://devdocs.io/javascript/global_objects/array/reduce) to sum all the counts together. Note that since it needs the list of items to operate on, it calls the `getItems` selector to get that list. As you write more complex selectors that derive data, you'll find that using other selectors helps to simplify things.
+    Assuming each item object has a `count` property, this selector uses [`array.reduce`](https://devdocs.io/javascript/global_objects/array/reduce) to sum all the counts together. Note that the items are stored in an object called `byId`, where each key of the object is an ID and the value is the item itself, as opposed to storing them in an array. This organization technique is sometimes called state normalization and is recommended [in the Redux docs](http://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html) as well as [by Dan Abramov](https://egghead.io/lessons/javascript-redux-normalizing-the-state-shape), the original creator of Redux. Organizing the data in this way (paired with an `ids` array so that you can preserve order) allows for simpler lookups and updates of individual items.
+
+    The drawback with this approach is that we need to go through some gymnastics if we ever need to access the data as an array as we do in this example. Since a plain object doesn't have a `reduce` method, we first call [`Object.keys`](https://devdocs.io/javascript/global_objects/object/keys) on the object to get an array of IDs and operate on that instead. It's a little ugly, but it works.
 
 These examples are fairly generic, but they demonstrate the kinds of selectors you might find yourself writing in a Redux application. Let's see them all together, this time exporting them so they can be used in our components.
 
@@ -76,11 +78,11 @@ export const getUserName = state => state.user.name
 export const isLoggedIn = state => state.user.id != null
 
 export const getTotalItemCount = state =>
-    Object.keys(state.items.byId)
-        .reduce((total, id) => total.state.items[byId].count, 0)
+    Object.values(state.items.byId)
+        .reduce((total, item) => total + item.count, 0)
 ```
 
-Those implicit returns make the functions nice and succinct. Not bad!
+Those implicit returns make the functions nice and succinct. Not bad! Note that I replaced the `Object.keys` call with [`Object.values`](https://devdocs.io/javascript/global_objects/object/values), which, as the name implies, returns an array of the property *values* rather than the *keys*, making it less cumbersome to get the data we actually need. (`Object.values` is an ES2017 feature, and you'll need a polyfill to use it in environments that don't support it. Using Babel transforms isn't enough because it's a built-in method—you'll need something like [babel-poylfill](http://babeljs.io/docs/usage/polyfill/).)
 
 We might be pretty happy with our selector functions at this point, especially with the concise ES2015 syntax. But can we make them better? Let's take a look at Ramda and see what it can do for us.
 
