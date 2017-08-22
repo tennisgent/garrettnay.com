@@ -355,6 +355,54 @@ There's a fair amount of stuff going on here, and once you get to a certain leve
 
 As with the last example, let's consider what we are trying to learn from the data. Putting aside for a moment all the work we need to do to get to the relevant data, the meat of what we're trying to do is this: get the sum of every item's `count` property.
 
-[next example](http://ramdajs.com/repl/#?const%20state%20%3D%20%7B%0A%20items%3A%20%7B%0A%20byId%3A%20%7B%0A%20abc123%3A%20%7B%20count%3A%202%20%7D%2C%0A%20abc125%3A%20%7B%20count%3A%204%20%7D%0A%20%7D%0A%20%7D%0A%7D%0A%0A%2F%2F%20function%20getTotalItemCount%28state%29%20%7B%0A%2F%2F%20return%20Object.keys%28state.items.byId%29%0A%2F%2F%20.reduce%28%28total%2C%20id%29%20%3D%3E%20total%20%2B%20state.items.byId%5Bid%5D.count%2C%200%29%0A%2F%2F%20%7D%0A%0Aconst%20sumCounts%20%3D%20compose%28sum%2C%20values%2C%20map%28prop%28%27count%27%29%29%29%0A%0Aconst%20pathOrObj%20%3D%20pathOr%28%7B%7D%29%0A%0Aconst%20getTotalItemCount%20%3D%20compose%28sumCounts%2C%20pathOrObj%28%5B%27items%27%2C%20%27byId%27%5D%29%29%0A%0A%2F%2F%20getTotalItemCount%28state%29%0A%0Areduce%28%28total%2C%20item%29%20%3D%3E%20total%20%2B%20item.count%2C%200%2C%20state.items.byId%29)
+Let's create a function `sumCounts` that takes an array of items and returns the sum of each item's `count` property. Here's an initial stab at it using vanilla JavaScript:
+
+```js
+const sumCounts = items =>
+    items.reduce((total, item) => total + item.count, 0)
+```
+
+As a first step, we can use Ramda's [`reduce` function](https://devdocs.io/ramda/index#reduce), which, similar to the `map` function we saw above, takes the reducing function first and the data second, allowing us to remove the `items` parameter completely.
+
+```js
+const sumCounts = R.reduce((total, item) => total + item.count, 0)
+```
+
+It's looking pretty good so far, but that anonymous function could use some improvement. Whenever I see a one-off anonymous function like that passed to functions like `map` or `reduce`, I like to think if there could be a way to use a named function that better describes what's going on.
+
+```js
+const sumCounts = R.reduce(addCount, 0)
+```
+
+Doesn't that look better? Now we're moving closer to describing *what* we want from the data rather than *how* we're getting it. Of course, now we need to define an `addCount` function. Its plain extracted form looks like this:
+
+```js
+const addCount = (total, item) => total + item.count
+```
+
+Can we also define this function in terms of other functions? Let's see how Ramda can help us here. You probably thought you'd never use it, but let's use Ramda's `add` function instead of using addition syntax:
+
+```js
+const addCount = (total, item) => add(total, item.count)
+```
+
+All right, now here is where things start to get interesting. Notice how we've almost gotten to a point where we're passing the arguments directly along to another function. The only difference is that instead of passing `item` directly to `add`, we need to pull the `count` property off it. If we could find a way to transform that argument before it gets passed to `add`, we could do away with the arguments altogether and write this function in a pointfree style. That may sound crazy, but stay with me.
+
+Turns out Ramda [has a function `prop`](https://devdocs.io/ramda/index#prop) that returns the property you name from an object. We can use that here:
+
+```js
+const addCount = (total, item) => add(total, prop('item', count))
+
+// or, using the curried form
+const addCount = (total, item) => add(total, prop('item')(count))
+```
+
+Now hopefully it's even clearer what we are trying to do. In generic terms, we are taking two arguments and passing them to another function, leaving the first argument unchanged but applying a different function to the second argument before passing it through.
+
+I have to admit this part was a real struggle for me as I was figuring it out. But once I was able to frame the problem in generic terms, I was better able to find the right functions to help me.
+
+Enter [`useWith`](https://devdocs.io/ramda/index#useWith).
+
+[useWith example](http://ramdajs.com/repl/?v=0.24.1#?const%20items%20%3D%20%5B%0A%20%7B%20id%3A%201%2C%20count%3A%202%20%7D%2C%0A%20%7B%20id%3A%202%2C%20count%3A%204%20%7D%2C%0A%20%7B%20id%3A%203%2C%20count%3A%207%20%7D%0A%5D%0A%0Aconst%20sumCounts%20%3D%20reduce%28useWith%28add%2C%20%5Bidentity%2C%20prop%28%27count%27%29%5D%29%2C%200%29%0A%0AsumCounts%28items%29)
 
 ## Why?
