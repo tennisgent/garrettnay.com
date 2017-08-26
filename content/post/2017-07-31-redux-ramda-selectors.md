@@ -362,6 +362,22 @@ const sumCounts = items =>
     items.reduce((total, item) => total + item.count, 0)
 ```
 
+I have to admit this part was a real struggle for me as I was figuring it out. There's a good chance I was making it harder for myself than I needed to by using `reduce`.  Using some more of Ramda's functions available to us, the most straighforward way to solve this problem might be to map over each item to get the `count` property and then sum them together, like so:
+
+```js
+const sumCounts = R.compose(R.sum, R.map(R.prop('count')))
+```
+
+It gets even simpler than that by using a function called [`pluck`](https://devdocs.io/ramda/index#pluck), which is essentially a convenience form of `map` for the way we're using it here.
+
+```js
+const sumCounts = R.compose(R.sum, R.pluck('count'))
+```
+
+That works. It will get the job done. But it's also a little unsatisfying because it requires looping through the array of items twice. And that's not even counting the transformations we'll need to go through to *get* the items in array form. It would be nice to be able to cut down on the number of times we have to go through an array.
+
+But once I was able to frame the problem in generic terms, I was better able to find the right functions to help me.
+
 As a first step, we can use Ramda's [`reduce` function](https://devdocs.io/ramda/index#reduce), which, similar to the `map` function we saw above, takes the reducing function first and the data second, allowing us to remove the `items` parameter completely.
 
 ```js
@@ -383,7 +399,7 @@ const addCount = (total, item) => total + item.count
 Can we also define this function in terms of other functions? Let's see how Ramda can help us here. You probably thought you'd never use it, but let's use Ramda's `add` function instead of using addition syntax:
 
 ```js
-const addCount = (total, item) => add(total, item.count)
+const addCount = (total, item) => R.add(total, item.count)
 ```
 
 All right, now here is where things start to get interesting. Notice how we've almost gotten to a point where we're passing the arguments directly along to another function. The only difference is that instead of passing `item` directly to `add`, we need to pull the `count` property off it. If we could find a way to transform that argument before it gets passed to `add`, we could do away with the arguments altogether and write this function in a pointfree style. That may sound crazy, but stay with me.
@@ -391,15 +407,13 @@ All right, now here is where things start to get interesting. Notice how we've a
 Turns out Ramda [has a function `prop`](https://devdocs.io/ramda/index#prop) that returns the property you name from an object. We can use that here:
 
 ```js
-const addCount = (total, item) => add(total, prop('item', count))
+const addCount = (total, item) => R.add(total, prop('item', count))
 
 // or, using the curried form
-const addCount = (total, item) => add(total, prop('item')(count))
+const addCount = (total, item) => R.add(total, prop('item')(count))
 ```
 
 Now hopefully it's even clearer what we are trying to do. In generic terms, we are taking two arguments and passing them to another function, leaving the first argument unchanged but applying a different function to the second argument before passing it through.
-
-I have to admit this part was a real struggle for me as I was figuring it out. But once I was able to frame the problem in generic terms, I was better able to find the right functions to help me.
 
 Enter [`useWith`](https://devdocs.io/ramda/index#useWith).
 
