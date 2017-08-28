@@ -351,9 +351,9 @@ export const getTotalItemCount = state =>
         .reduce((total, item) => total + item.count, 0)
 ```
 
-There's a fair amount of stuff going on here, and once you get to a certain level of complexity you'll find that there are multiple ways to break a problem down in a functional style. The way I'm presenting here isn't the only way, nor is it necessarily the best way. Someone more advanced in FP and Ramda could almost certainly find a more efficient or sensible way to do it. This is simply *a* way, and I encourage you to try different ways and see if you can make it better.
+There's a fair amount of stuff going on here, and once you get to a certain level of complexity you'll find that there are multiple ways to break a problem down in a functional style. Because of that, I'm going to explain two different possibilities for how to accomplish it. They certailny aren't the only ways to do it, nor are they necessarily the best ways. Someone more advanced in FP and Ramda could almost certainly find a more efficient or sensible way to do it. I encourage you to try different ways and see if you can make it better.
 
-As with the last example, let's consider what we are trying to learn from the data. Putting aside for a moment all the work we need to do to get to the relevant data, the meat of what we're trying to do is this: get the sum of every item's `count` property.
+As with the last example, let's frame our problem by considering what we are trying to learn from the data. Putting aside for a moment all the work we need to do to get to the relevant slice of the state tree, the meat of what we're trying to do is this: get the sum of every item's `count` property.
 
 Let's create a function `sumCounts` that takes an array of items and returns the sum of each item's `count` property. Here's an initial stab at it using vanilla JavaScript:
 
@@ -362,29 +362,45 @@ const sumCounts = items =>
     items.reduce((total, item) => total + item.count, 0)
 ```
 
-I have to admit this part was a real struggle for me as I was figuring it out. There's a good chance I was making it harder for myself than I needed to by using `reduce`.  Using some more of Ramda's functions available to us, the most straighforward way to solve this problem might be to map over each item to get the `count` property and then sum them together, like so:
+Now we'd like to rewrite this using Ramda functions, ideally in a point-free style. Here's where branch into two different possibilities. One of them relies on using `map` to transform the items before summing the counts, and the other uses `reduce` to do it all at once.
+
+#### Using `map`
+
+Using `map` to transform the data into a form we need is probably the most obvious and straightforward way to do it. It's made even easier by the fact that Ramda has a [`sum` function](https://devdocs.io/ramda/index#sum) that takes an array of numbers and returns, well, the sum.
 
 ```js
 const sumCounts = R.compose(R.sum, R.map(R.prop('count')))
 ```
 
-It gets even simpler than that by using a function called [`pluck`](https://devdocs.io/ramda/index#pluck), which is essentially a convenience form of `map` for the way we're using it here.
+Remember that `compose` passes our arguments (in this case, the array of items) to the rightmost function and then the return value of that function to the next one. The rightmost function here is a `map` that applies a function created by `prop('count')`.
+
+We haven't seen [the `prop` function](https://devdocs.io/ramda/index#prop) before, but what it does is take the prop of the name you give it from the object you pass to it as the second argument. Since we're passing only the first argument here, it instead creates a function that takes the object to pull the prop from. So we can pass that partially applied function to `map`, which will pass each item in the array to it. The `map` function will therefore map each item to its `count` property, resulting in an array of numbers that can then be passed into `sum`.
+
+As it turns out, using `map` in this way—to pluck a property off each object—is such a common usage that Ramda provides a convenience function for it called [`pluck`](https://devdocs.io/ramda/index#pluck). Using `pluck` makes our function even simpler:
 
 ```js
 const sumCounts = R.compose(R.sum, R.pluck('count'))
 ```
 
-That works. It will get the job done. But it's also a little unsatisfying because it requires looping through the array of items twice. And that's not even counting the transformations we'll need to go through to *get* the items in array form. It would be nice to be able to cut down on the number of times we have to go through an array.
+There we go. It looks pretty good. Now we have a function to which we can pass an array of `items` that each have a `count` property and get the total count.
 
-But once I was able to frame the problem in generic terms, I was better able to find the right functions to help me.
+Before moving on to using this function with the actual state object, let's consider an alternative.
 
-As a first step, we can use Ramda's [`reduce` function](https://devdocs.io/ramda/index#reduce), which, similar to the `map` function we saw above, takes the reducing function first and the data second, allowing us to remove the `items` parameter completely.
+#### Using `reduce`
+
+The mapping version of `sumCounts` that we created will get the job done. But I'd like to figure out how to do it with a `reduce` instead. If I didn't have Ramda at my disposal in a project and had to use vanilla JavaScript, I'd use `reduce`, as you can see above. Why? Because I like to avoid looping through an array more than once if I can. In the `map` version, we loop through the array once to map each item to its `count` and then once more to sum them up. That's not even counting the work we'll need to do before this to get to the array of items we need.
+
+With `reduce`, we should be able to do both of those steps in one go. Perhaps this is a case of [premature optimization](https://en.wikipedia.org/wiki/Program_optimization#When_to_optimize), especially if it makes the code harder to understand (although I'll have more to say about unfamiliarity at the end of the article). It might even be a wash because of how many functions are being applied, which can reduce performance. But for argument's sake, and for the sake of better understanding some more Ramda concepts, let's work on a `reduce` version.
+
+I have to admit that I really struggled with this part. But once I was able to frame the problem in generic terms, I was better able to find the functions I needed. You'll see what I mean shortly.
+
+As a first step, we can use Ramda's [`reduce` function](https://devdocs.io/ramda/index#reduce), which, similar to the `map` function we used above, takes the reducing function first and the data second, allowing us to remove the `items` parameter completely.
 
 ```js
 const sumCounts = R.reduce((total, item) => total + item.count, 0)
 ```
 
-It's looking pretty good so far, but that anonymous function could use some improvement. Whenever I see a one-off anonymous function like that passed to functions like `map` or `reduce`, I like to think if there could be a way to use a named function that better describes what's going on.
+It's looking pretty good so far, but that anonymous function could use some improvement. Whenever I see a one-off anonymous function like that passed to functions like `map` or `reduce`, I like to think if there could be a way to use a named function that describes what's going on.
 
 ```js
 const sumCounts = R.reduce(addCount, 0)
@@ -396,27 +412,27 @@ Doesn't that look better? Now we're moving closer to describing *what* we want f
 const addCount = (total, item) => total + item.count
 ```
 
-Can we also define this function in terms of other functions? Let's see how Ramda can help us here. You probably thought you'd never use it, but let's use Ramda's `add` function instead of using addition syntax:
+Could we also define this function in terms of other functions? Let's see how Ramda can help us here. You probably thought you'd never use it, but let's use Ramda's `add` function instead of using addition syntax:
 
 ```js
 const addCount = (total, item) => R.add(total, item.count)
 ```
 
-All right, now here is where things start to get interesting. Notice how we've almost gotten to a point where we're passing the arguments directly along to another function. The only difference is that instead of passing `item` directly to `add`, we need to pull the `count` property off it. If we could find a way to transform that argument before it gets passed to `add`, we could do away with the arguments altogether and write this function in a pointfree style. That may sound crazy, but stay with me.
+All right, now here is where things start to get interesting. Notice how we've almost gotten to a point where we're passing the arguments directly along to another function. The only difference is that instead of passing `item` directly to `add`, we need to pull the `count` property off it. If we could find a way to transform that argument before it gets passed to `add`, we could do away with the arguments altogether and write this function in a point-free style. That may sound crazy, but stay with me.
 
-Turns out Ramda [has a function `prop`](https://devdocs.io/ramda/index#prop) that returns the property you name from an object. We can use that here:
+We've already seen the `prop` function in the `map` example above. We can use that same function here:
 
 ```js
-const addCount = (total, item) => R.add(total, prop('item', count))
+const addCount = (total, item) => R.add(total, prop('count', item))
 
-// or, using the curried form
-const addCount = (total, item) => R.add(total, prop('item')(count))
+// OR, using the curried form
+const addCount = (total, item) => R.add(total, prop('count')(item))
 ```
 
-Now hopefully it's even clearer what we are trying to do. In generic terms, we are taking two arguments and passing them to another function, leaving the first argument unchanged but applying a different function to the second argument before passing it through.
+Now that it's functions all the way down, let's take a step back and think about what we're doing in generic terms. We are taking two arguments and passing them to another function, leaving the first argument unchanged but applying a different function to the second before passing it through.
 
-Enter [`useWith`](https://devdocs.io/ramda/index#useWith).
+And you guessed it—Ramda has a function for that! It's called [`useWith`](https://devdocs.io/ramda/index#useWith), and it's one that I didn't understand the point of until I was working on this problem. It will most likely look foreign to you if you're not used to programming in a functional way. It certainly did to me.
 
-[useWith example](http://ramdajs.com/repl/?v=0.24.1#?const%20items%20%3D%20%5B%0A%20%7B%20id%3A%201%2C%20count%3A%202%20%7D%2C%0A%20%7B%20id%3A%202%2C%20count%3A%204%20%7D%2C%0A%20%7B%20id%3A%203%2C%20count%3A%207%20%7D%0A%5D%0A%0Aconst%20sumCounts%20%3D%20reduce%28useWith%28add%2C%20%5Bidentity%2C%20prop%28%27count%27%29%5D%29%2C%200%29%0A%0AsumCounts%28items%29)
+`useWith` takes two parameters: a function and array of functions.
 
 ## Why?
