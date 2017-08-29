@@ -431,8 +431,89 @@ const addCount = (total, item) => R.add(total, prop('count')(item))
 
 Now that it's functions all the way down, let's take a step back and think about what we're doing in generic terms. We are taking two arguments and passing them to another function, leaving the first argument unchanged but applying a different function to the second before passing it through.
 
-And you guessed it—Ramda has a function for that! It's called [`useWith`](https://devdocs.io/ramda/index#useWith), and it's one that I didn't understand the point of until I was working on this problem. It will most likely look foreign to you if you're not used to programming in a functional way. It certainly did to me.
+And you guessed it—Ramda has a function for that! It's called [`useWith`](https://devdocs.io/ramda/index#useWith), and it's one that I didn't understand the point of until I was working on this very problem. It will most likely look foreign to you if you're not used to programming in a functional way. It certainly did to me. I'll try to explain it.
 
-`useWith` takes two parameters: a function and array of functions.
+`useWith` takes two parameters: a function and array of functions. The functions in the array are called transformer functions—they transform the argument that corresponds to their position in the array before passing it to the first function. In other words, the first function in the array transforms the first argument, the second function the second argument, and so on. The transformed arguments are then passed to the function that was passed as the first argument to `useWith`.
 
-## Why?
+In our case here, the function we want the arguments to be passed to at the end is `add`, so we pass that as the first argument.
+
+```js
+const addCount = R.useWith(R.add, [/* transformers */])
+```
+
+We know that we need to transform the second argument of `add` by getting the `count` prop off it, so we can put that as the second function in the transformers array.
+
+```js
+const addCount = R.usseWith(R.add [/* 1st */, R.prop('count')])
+```
+
+What about the first argument? It corresponds to the total count. It's already a number, so we don't want to transform it at all. Here's where another seemingly useless function actually becomes useful. It's called [`identity`](https://devdocs.io/ramda/index#identity), and all it does is return the same value that was passed to it. It sounds silly by itself, but in a situation like this it is exactly what we need.
+
+```js
+const addCount = R.useWith(R.add, [R.identity, R.prop('count')])
+```
+
+Let's recap what we've created here. Using `useWith`, we wrapped the `add` function with some transformer functions. The first argument, which corresponds to the total count, is passed to the `identity` function and therefore remains unchanged. The second argument, which corresponds to an item in the array, is passed to the function created by `prop('count')` so we get the `count` property off it. Those two transformed arguments are then passed to `add`. The result is a function we can pass to `reduce`, just as we wanted:
+
+```js
+const addCount = R.useWith(R.add, [R.identity, R.prop('count')])
+
+const sumCounts = R.reduce(addCount, 0)
+```
+
+If we want, we could make generic forms of these functions that work with any property name, in case we ever wanted to sum up different properties on a list of items.
+
+```js
+const addProp = propName => R.useWith(R.add, [R.identity, R.prop(propName)])
+
+const sumProps = propName => R.reduce(addProp(propName), 0)
+
+const sumCounts = sumProps('count')
+```
+
+We could take this even further by accepting a transforming function instead of hardcoding our own. For example, suppose each item had an array of comment IDs on it, and we wanted to sum the total length of each item's array of comments.
+
+```js
+const addTransformedItem = transformer =>
+    R.useWith(R.add, [R.identity, transformer])
+
+const sumTransformedItems = transformer =>
+    R.reduce(addTransformedItem(transformer), 0)
+
+const totalItemComments = R.compose(R.length, R.prop('comments'))
+
+const sumComments = sumTransformedItems(totalItemComments)
+```
+
+Those probably aren't the best names, but naming things is hard. And whether or not it would be useful to abstract things this far depends on your data and how you're using it. Whichever avenue we choose to go down, we've successfully created a `sumCounts` function that's built using smaller, more expressive, reusable functions.
+
+---
+
+Now that we have our `sumCounts` function, we need to make it work with the shape of our data. As discussed above, the state object looks like this:
+
+```js
+const state = {
+    items: {
+        byId: {
+            'item1': { id: 'item1', count: 2 },
+            'item2': { id: 'item2', count: 4 },
+            'item3': { id: 'item3', count: 7 }
+        }
+    }
+}
+```
+
+The items aren't kept in an array, but `sumCounts` needs them to be an array. Ramda can help us here again with its [`values` function](https://devdocs.io/ramda/index#values), which is similar to `Object.values` except you don't need to worry about browser support.
+
+We already know a function to get to a certain path on an object, we know a function to transform an object into an array, and we now have a function for summing up the counts. With those functions in hand, it's a matter of composing them together.
+
+```js
+const getTotalItemCount =
+    R.compose(sumCounts, R.values, R.path(['items', 'byId']))
+```
+
+[Try it out in the Ramda REPL](http://ramdajs.com/repl/?v=0.24.1#?const%20state%20%3D%20%7B%0A%20items%3A%20%7B%0A%20byId%3A%20%7B%0A%20%27item1%27%3A%20%7B%20id%3A%20%27item1%27%2C%20count%3A%202%20%7D%2C%0A%20%27item2%27%3A%20%7B%20id%3A%20%27item2%27%2C%20count%3A%204%20%7D%2C%0A%20%27item3%27%3A%20%7B%20id%3A%20%27item3%27%2C%20count%3A%207%20%7D%0A%20%7D%0A%20%7D%0A%7D%0A%0A%2F%2F%20map%20version%0A%2F%2F%20const%20sumCounts%20%3D%20R.compose%28R.sum%2C%20R.pluck%28%27count%27%29%29%0A%0Aconst%20addProp%20%3D%20propName%20%3D%3E%20R.useWith%28R.add%2C%20%5BR.identity%2C%20R.prop%28propName%29%5D%29%0A%0Aconst%20sumProps%20%3D%20propName%20%3D%3E%20R.reduce%28addProp%28propName%29%2C%200%29%0A%0Aconst%20sumCounts%20%3D%20sumProps%28%27count%27%29%0A%0Aconst%20getTotalItemCount%20%3D%0A%20R.compose%28sumCounts%2C%20R.values%2C%20R.path%28%5B%27items%27%2C%20%27byId%27%5D%29%29%0A%0AgetTotalItemCount%28state%29). Play around with it and try the different versions we talked about. See if you can make it even better.
+
+## Wrapping Up: What We've Done
+
+## Why Did We Do This?
