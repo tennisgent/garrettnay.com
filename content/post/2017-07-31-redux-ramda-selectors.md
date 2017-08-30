@@ -508,7 +508,7 @@ The items aren't kept in an array, but `sumCounts` needs them to be an array. Ra
 We already know a function to get to a certain path on an object, we know a function to transform an object into an array, and we now have a function for summing up the counts. With those functions in hand, it's a matter of composing them together.
 
 ```js
-const getTotalItemCount =
+export const getTotalItemCount =
     R.compose(sumCounts, R.values, R.path(['items', 'byId']))
 ```
 
@@ -516,4 +516,35 @@ const getTotalItemCount =
 
 ## Wrapping Up: What We've Done
 
+Whew! It's been a long journey, but we made it, successfully rewriting our Redux selectors in a functional, composable, point-free way. Let's recap everything we've built, putting it all together in one module.
+
+```js
+import R from 'ramda'
+
+// Helper functions
+const isNotNil = R.complement(R.isNil)
+const pathIsNotNil = path => R.compose(isNotNil, R.path(path))
+const addProp = propName => R.useWith(R.add, [R.identity, R.prop(propName)])
+const sumProps = propName => R.reduce(addProp(propName), 0)
+const sumCounts = sumProps('count')
+
+// Selector functions
+export const getUserName = R.path(['user', 'name'])
+export const isLoggedIn = pathIsNotNil(['user', 'id'])
+export const getTotalItemCount =
+    R.compose(sumCounts, R.values, R.path(['items', 'byId']))
+```
+
+As you can see, not only have we rewritten our selectors in a more functional manner, we've also created a handful of helper functions as building blocks for the selectors. Those helper functions will almost certainly be useful elsewhere in the project code, whereas before everything was made with one-off anonymous functions that couldn't be reused. This is one area where Ramda really shines: it gives you a slew of useful functions to begin with, but the automatic currying and argument order make it easy for you to take those functions and make even more useful functions for your app's specific needs—functions that can be used in multiple places. I hope you're starting to become convinced of Ramda's usefulness.
+
 ## Why Did We Do This?
+
+You might still be questioning whether we did in fact make the code any better by refactoring it this way. It's not like the original selector functions were difficult to understand. They were simple, pure functions to begin with, and that's great. Now we've added a layer of indirection by using a library, and the point-free style can look rather strange to the uninitiated.
+
+Throughout this article I've talked about point-free style as though it's a goal in itself. If you've made it this far in the article, thank you for giving me the benefit of the doubt. Now let's talk about why point-free style can be a good thing for your code.
+
+I'll start by saying that in other languages, point-free functions are entirely standard. In Haskell, for example, most functions are automatically curried (which is appropriate, since both Haskell and currying are named after the mathematician [Haskell Curry](https://en.wikipedia.org/wiki/Haskell_Curry)), so point-free style follows naturally from that. I know that "other people are doing it" in itself is a bad argument. I bring this up only to point out that Ramda isn't inventing some shiny new hotness here but is drawing upon decades of research and theory. It may be shiny and hot, but it's not new.
+
+So why is it so popular outside of JavaScript Land? I admit I've sometimes had a hard time articulating the benefits, other than it's fun! But [this article from Randy Coulman](http://randycoulman.com/blog/2016/06/21/thinking-in-ramda-pointfree-style/) really helped me solidify things more. I've mentioned that point-free style can make your functions more concise. Great. But the real selling point for me is that it transforms the way you think about functions. Instead of focusing on the data itself, you start thinking more in terms of the transformations that need to take place to get what you need. It's less about the *how* and more about the *what*. It truly is more declarative. I know the "word" declarative gets thrown around a lot these days, but to me, point-free functions really are declarative because you're declaring relationships between data.
+
+After all, what is functional programming?
