@@ -47,7 +47,7 @@ Selector functions take the Redux state tree object and return whatever data you
     }
     ```
 
-    Assuming each item object has a `count` property, this selector uses [`array.reduce`](https://devdocs.io/javascript/global_objects/array/reduce) to sum all the counts together. Note that the items are stored in an object called `byId`, where each key of the object is an ID and the value is the item itself, as opposed to storing them in an array. This organization technique is sometimes called state normalization and is recommended [in the Redux docs](http://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html) as well as [by Dan Abramov](https://egghead.io/lessons/javascript-redux-normalizing-the-state-shape), the original creator of Redux. Organizing the data in this way (paired with an `ids` array so that you can preserve order) allows for simpler lookups and updates of individual items.
+    Assuming each item object has a `count` property, this selector uses [`array.reduce`](https://devdocs.io/javascript/global_objects/array/reduce) to sum all the counts together. Note that the items are stored in an object called `byId`, where each key of the object is an ID and the value is the item itself, as opposed to storing them in an array. This organizational technique is sometimes called state normalization and is recommended [in the Redux docs](http://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html) as well as [by Dan Abramov](https://egghead.io/lessons/javascript-redux-normalizing-the-state-shape), the original creator of Redux. Organizing the data in this way (paired with an `ids` array so that you can preserve order) allows for simpler lookups and updates of individual items.
 
     The drawback with this approach is that we need to go through some gymnastics if we ever need to access the data as an array as we do in this example. Since a plain object doesn't have a `reduce` method, we first call [`Object.keys`](https://devdocs.io/javascript/global_objects/object/keys) on the object to get an array of IDs and operate on that instead. It's a little ugly, but it works.
 
@@ -62,7 +62,7 @@ export function isLoggedIn(state) {
     return state.user.id != null
 }
 
-function getTotalItemCount(state) {
+export function getTotalItemCount(state) {
     return Object.keys(state.items.byId)
         .reduce(function(total, id) {
             return total + state.items.byId[id].count
@@ -129,7 +129,7 @@ const addCurried = a => b => a + b
 
 Notice the difference? Now instead of taking both arguments at once, `addCurried` first takes one argument and returns another function that takes the second argument. Arrow functions make currying much more convenient to write in JavaScript than it used to be.
 
-We can use curried functions to create reusable functions with partially applied arguments:
+We can use curried functions to create reusable functions with [partially applied](https://en.wikipedia.org/wiki/Partial_application) arguments:
 
 ```js
 // create a function that adds 2 to its argument
@@ -149,7 +149,7 @@ Adding is the "Hello world" of currying examples. Let's look at something a litt
 
 Let's say we have an array of numbers, and we want multiply each number by 2. With a curried `multiply` function we can easily create an `double` function that doubles whatever number you pass to it.
 
-*Note: from now on in this article, all Ramda functions will be prefixed with an `R` so it's clear where they come from. It's also possible to import specific functions. If you do that, and you're using Babel, I recommend checking out the [Ramda Babel plugin](https://github.com/megawac/babel-plugin-ramda) to help keep your builds smaller.*
+*Note: from now on in this article, all Ramda functions will be prefixed with an `R` so it's clear where they come from, just like in the [Ramda documentation](https://devdocs.io/ramda/). It's also possible to import specific functions. If you do that, and you're using Babel, I recommend checking out the [Ramda Babel plugin](https://github.com/megawac/babel-plugin-ramda) to help keep your builds smaller.*
 
 ```js
 // create a function that always multiplies by 2
