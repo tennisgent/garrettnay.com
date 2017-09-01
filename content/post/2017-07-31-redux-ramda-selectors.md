@@ -156,7 +156,7 @@ Let's say we have an array of numbers, and we want multiply each number by 2. Wi
 const double = R.multiply(2)
 ```
 
-Now how do you apply a function to every element in array to get a new array? by using a `map`, right?
+Now how do you apply a function to every element in array to get a new array? By using a `map`, right?
 
 ```js
 const nums = [1, 2, 3, 4]
@@ -194,6 +194,12 @@ Now let's see how Ramda helps us write better Redux selectors.
 Let's go back to the selector examples we wrote earlier and rewrite them using Ramda.
 
 ### `getUserName`
+
+We start with the simplest one:
+
+```js
+export const getUserName = state => state.user.name
+```
 
 For this one we need to get nested properties off the `state` object. Ramda happens to have a convenient function for this purpose, [`path`](https://devdocs.io/ramda/index#path). The first parameter is an array defining the path, and the second is the object to find the property on.
 
@@ -267,7 +273,7 @@ Or we could go even further with using Ramda functions. You guessed it! There is
 const isNotNil = val = R.not(R.isNil(val))
 ```
 
-The second version seems silly, but now we're using nothing but functions. Yay! But we can do better. Now that you've had a taste of point-free style, you'll hopefully start looking for opportunities to refactor to that style. Can we define a function that doesn't reference `val` at all?
+The second version seems silly, but now we're using nothing but functions, so yay. But we can do better. Now that you've had a taste of point-free style, you'll hopefully start looking for opportunities to refactor to that style. Can we define a function that doesn't reference `val` at all?
 
 Yes. Yes, we can. But instead of using `not`, we'll use [a different function called `complement`](https://devdocs.io/ramda/index#complement). Whereas `not` immediately returns the complement of the *value* you pass to it (what you would get by putting a `!` in front of it), `complement` takes a *function* and returns a new function that, when called, returns the complement of whatever the original function returns.
 
@@ -281,7 +287,7 @@ isNotNil(null) // false
 isNotNil(undefined) // false
 ```
 
-Great, so now we have an `isNotNil` function, written in that sweet, sweet point-free style for good measure.
+Great! So now we have an `isNotNil` function, written in that sweet, sweet point-free style for good measure.
 
 Now how do we put that together with `path`? First let's try to the naive approach:
 
@@ -351,7 +357,7 @@ export const getTotalItemCount = state =>
         .reduce((total, item) => total + item.count, 0)
 ```
 
-There's a fair amount of stuff going on here, and once you get to a certain level of complexity you'll find that there are multiple ways to break a problem down in a functional style. Because of that, I'm going to explain two different possibilities for how to accomplish it. They certailny aren't the only ways to do it, nor are they necessarily the best ways. Someone more advanced in FP and Ramda could almost certainly find a more efficient or sensible way to do it. I encourage you to try different ways and see if you can make it better.
+There's a fair amount of stuff going on here, and once you get to a certain level of complexity you'll find that there are multiple ways to break a problem down into a functional style. Because of that, I'm going to explain two different possibilities for how to accomplish it. They certainly aren't the only ways to do it, nor are they necessarily the best ways. Someone more advanced in FP and Ramda could almost certainly find a more efficient or sensible way to do it. I encourage you to try different ways and see if you can make it better.
 
 As with the last example, let's frame our problem by considering what we are trying to learn from the data. Putting aside for a moment all the work we need to do to get to the relevant slice of the state tree, the meat of what we're trying to do is this: get the sum of every item's `count` property.
 
@@ -362,7 +368,7 @@ const sumCounts = items =>
     items.reduce((total, item) => total + item.count, 0)
 ```
 
-Now we'd like to rewrite this using Ramda functions, ideally in a point-free style. Here's where branch into two different possibilities. One of them relies on using `map` to transform the items before summing the counts, and the other uses `reduce` to do it all at once.
+Now we'd like to rewrite this using Ramda functions, ideally in a point-free style. Here's where we branch into two different possibilities. One of them relies on using `map` to transform the items before summing the counts, and the other uses `reduce` to do it all at once.
 
 #### Using `map`
 
@@ -374,7 +380,7 @@ const sumCounts = R.compose(R.sum, R.map(R.prop('count')))
 
 Remember that `compose` passes our arguments (in this case, the array of items) to the rightmost function and then the return value of that function to the next one. The rightmost function here is a `map` that applies a function created by `prop('count')`.
 
-We haven't seen [the `prop` function](https://devdocs.io/ramda/index#prop) before, but what it does is take the prop of the name you give it from the object you pass to it as the second argument. Since we're passing only the first argument here, it instead creates a function that takes the object to pull the prop from. So we can pass that partially applied function to `map`, which will pass each item in the array to it. The `map` function will therefore map each item to its `count` property, resulting in an array of numbers that can then be passed into `sum`.
+We haven't seen [the `prop` function](https://devdocs.io/ramda/index#prop) before, but what it does is take the prop of the name you give it from the object you pass to it as the second argument. It's similar to `path` but goes only one level deep. Since we're passing just the first argument here, it creates a function that takes the object to pull the prop from. So we can pass that partially applied function to `map`, which will pass each item in the array to it. The `map` function will therefore map each item to its `count` property, resulting in an array of numbers that can then be passed into `sum`.
 
 As it turns out, using `map` in this way—to pluck a property off each object—is such a common usage that Ramda provides a convenience function for it called [`pluck`](https://devdocs.io/ramda/index#pluck). Using `pluck` makes our function even simpler:
 
@@ -545,7 +551,7 @@ Throughout this article I've talked about point-free style as though it's a goal
 
 I'll start by saying that in other languages, point-free functions are entirely standard. In Haskell, for example, most functions are automatically curried (which is appropriate, since both Haskell and currying are named after the mathematician [Haskell Curry](https://en.wikipedia.org/wiki/Haskell_Curry)), so point-free style follows naturally from that. I know that "other people are doing it" in itself is a bad argument. I bring this up only to point out that Ramda isn't inventing some shiny new hotness here but is drawing upon decades of research and theory. It may be shiny and hot, but it's not new.
 
-So why is it so popular outside of JavaScript Land? I admit I've sometimes had a hard time articulating the benefits, other than it's fun! But [this article from Randy Coulman](http://randycoulman.com/blog/2016/06/21/thinking-in-ramda-pointfree-style/) really helped me solidify things more. I've mentioned that point-free style can make your functions more concise. Great. But the real selling point for me is that it transforms the way you think about functions. Instead of focusing on the data itself, you start thinking more in terms of the transformations that need to take place to get what you need. It's less about the *how* and more about the *what*. It truly is more declarative. I know the "word" declarative gets thrown around a lot these days, but to me, point-free functions really are declarative because you're declaring relationships between data.
+So why is it so popular outside of JavaScript Land? I admit I've sometimes had a hard time articulating the benefits, other than it's fun! But [this article from Randy Coulman](http://randycoulman.com/blog/2016/06/21/thinking-in-ramda-pointfree-style/) really helped me solidify things more. I've mentioned that point-free style can make your functions more concise. Great. But the real selling point for me is that it alters the way you think about functions. Instead of focusing on the data itself, you start thinking more in terms of the transformations that need to take place to get what you need. It's less about the *how* and more about the *what*. It truly is more declarative. I know the word "declarative" gets thrown around a lot these days, but to me, point-free functions really are declarative because you're declaring relationships between data.
 
 After all, what is functional programming? It's programming with functions, yes, but the best description I've heard as to what sets it apart from other styles of programming is this: the data is separate from the functions that operate on it. In essence, functional programming is about using functions to describe relationships between sets of data. You see some of that when using React, for example. A React component is essentially a function that turns application data into data that can be rendered.
 
